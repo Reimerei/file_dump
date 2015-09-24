@@ -3,8 +3,8 @@ defmodule FileDump.Buffer do
 
   @timeout 500
 
-  def start_link(id, opts \\ []) do
-    GenServer.start_link(__MODULE__, id, opts)
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
   def add_chunk(server, 0 , data) do
@@ -28,8 +28,8 @@ defmodule FileDump.Buffer do
   ## GenServer Callbacks
   ##############################################################################
 
-  def init(id) do
-    {:ok, %{chunks: %{}, id: id}, @timeout}
+  def init(:ok) do
+    {:ok, %{chunks: %{}}, @timeout}
   end
 
   def handle_cast({:meta, meta}, state) do
@@ -42,7 +42,7 @@ defmodule FileDump.Buffer do
     {:noreply, check_if_complete(state), @timeout}
   end
 
-  def handle_cast(:write_file, state = %{file_name: file_name, path: path, chunks: chunks, id: id}) do
+  def handle_cast(:write_file, state = %{file_name: file_name, path: path, chunks: chunks}) do
     content =
       Enum.sort(chunks)
       |> Enum.map(fn({_, bin}) -> bin end)
@@ -51,15 +51,15 @@ defmodule FileDump.Buffer do
     base_path = Application.get_env(:file_dump, :base_path)
     complete_path = Path.join(base_path, path) |> Path.join(file_name)
     File.write!(complete_path, content)
-    {:stop, {:finished, id}, state}
+    {:stop, :normal, state}
   end
 
   def handle_call(:get, _from, state) do
     {:reply, state, state, @timeout}
   end
 
-  def handle_info(:timeout, state = %{id: id}) do
-    {:stop, {:timeout, id}, state}
+  def handle_info(:timeout, state) do
+    {:stop, :timeout, state}
   end
 
   ##############################################################################

@@ -17,9 +17,10 @@ defmodule FileDump.Mixfile do
     [
       applications: [:logger],
       env: [
-        base_path: "./store"
+        base_path: "./store",
+        listen_port: 7331
       ],
-      # mod: {FileDump, []},
+      mod: {FileDump, []},
     ]
   end
 
