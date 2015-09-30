@@ -18,7 +18,9 @@ defmodule FileDump.Mixfile do
       applications: [:logger],
       env: [
         base_path: "./store",
-        listen_port: 7331
+        packet_size: 1024,
+        port: 7331,
+        remote_host: "localhost"
       ],
       mod: {FileDump, []},
     ]

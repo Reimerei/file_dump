@@ -11,8 +11,8 @@ defmodule FileDump.Buffer do
     case :erlang.binary_to_term(data) do
       meta = %{file_name: _, chunk_count: _, path: _} ->
         GenServer.cast(server, {:meta, meta})
-      _ ->
-        :error
+      invalid ->
+        throw("invalid meta packet: #{inspect invalid}")
     end
   end
 
@@ -48,9 +48,12 @@ defmodule FileDump.Buffer do
       |> Enum.map(fn({_, bin}) -> bin end)
       |> Enum.join()
 
-    base_path = Application.get_env(:file_dump, :base_path)
-    complete_path = Path.join(base_path, path) |> Path.join(file_name)
-    File.write!(complete_path, content)
+    dir = Path.join(Application.get_env(:file_dump, :base_path), path)
+    if (File.exists?(dir)) do
+      File.mkdir_p!(dir)
+    end
+    file_path = Path.join(dir, file_name)
+    File.write!(file_path, content)
     {:stop, :normal, state}
   end
 

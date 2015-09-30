@@ -2,23 +2,26 @@ defmodule FileDump.Socket do
   use GenServer
   require Logger
 
-  def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+  def start_link(port \\ nil, opts \\ []) do
+    GenServer.start_link(__MODULE__, port, opts)
   end
 
   ##############################################################################
   ## GenServer Callbacks
   ##############################################################################
 
-  def init(:ok) do
+  def init(nil) do
+    init(Application.get_env(:file_dump, :port)) 
+  end
+
+  def init(port) do
     Process.flag(:trap_exit, true)
-    port = Application.get_env(:file_dump, :listen_port)
     Logger.info("Listening on port #{port}")
     {:ok, socket} = :gen_udp.open(port, [:binary])
     {:ok, %{buffers: %{}, socket: socket}}
   end
 
-  def handle_info({:udp, _, _, _, << id :: size(32), seq :: size(16), data :: binary >>}, state = %{buffers: buffers}) do
+  def handle_info({:udp, _, _, _, << id :: size(32), seq :: size(32), data :: binary >>}, state = %{buffers: buffers}) do
     case Map.get(buffers, id) do
       nil ->
         {:ok, pid} = FileDump.Buffer.start_link()
@@ -33,7 +36,6 @@ defmodule FileDump.Socket do
   def handle_info({:EXIT, pid, _reason}, state = %{buffers: buffers}) do
     {id, _} = buffers |> Enum.find(fn({_,p}) -> p == pid end)
     {:noreply, %{state | buffers: Map.delete(buffers, id)}}
-    # {:noreply, state}
   end
 
   def handle_info(msg, state) do

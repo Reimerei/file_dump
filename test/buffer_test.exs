@@ -10,7 +10,7 @@ defmodule FileDump.Test.Buffer do
   end
 
   test "return error for invalid metas", %{buffer: buffer} do
-    assert :error == FileDump.Buffer.add_chunk(buffer, 0, :erlang.term_to_binary(%{foo: 123}))
+    assert "invalid meta packet: %{foo: 123}" = catch_throw(FileDump.Buffer.add_chunk(buffer, 0, :erlang.term_to_binary(%{foo: 123})))
   end
 
   test "receive chunks in order", %{buffer: buffer, data: data, meta: meta} do
@@ -37,7 +37,7 @@ defmodule FileDump.Test.Buffer do
   def mock_file_write("./over/there/foo.bin", "bin1bin2bin3"), do: :ok
 
   test "write file when all data has arrived", %{buffer: buffer, data: data, meta: meta} do
-    with_mock File, [write!: &mock_file_write/2] do
+    with_mock File, [:passthrough], [write!: &mock_file_write/2] do
       Application.put_env(:file_dump, :base_path, "./")
       Process.flag(:trap_exit, true)
       FileDump.Buffer.add_chunk(buffer, 0, :erlang.term_to_binary(meta))
