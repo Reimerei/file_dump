@@ -11,7 +11,7 @@ defmodule FileDump.Socket do
   ##############################################################################
 
   def init(nil) do
-    init(Application.get_env(:file_dump, :port)) 
+    init(Application.get_env(:file_dump, :port))
   end
 
   def init(port) do

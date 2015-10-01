@@ -20,7 +20,7 @@ defmodule FileDump.Mixfile do
         base_path: "./store",
         packet_size: 1024,
         port: 7331,
-        remote_host: "localhost"
+        remote_host: 'localhost'
       ],
       mod: {FileDump, []},
     ]

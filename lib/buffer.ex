@@ -49,7 +49,7 @@ defmodule FileDump.Buffer do
       |> Enum.join()
 
     dir = Path.join(Application.get_env(:file_dump, :base_path), path)
-    if (File.exists?(dir)) do
+    if (!File.dir?(dir)) do
       File.mkdir_p!(dir)
     end
     file_path = Path.join(dir, file_name)

@@ -4,7 +4,7 @@ defmodule FileDump.Test.Buffer do
 
   setup do
     {:ok, buffer} = FileDump.Buffer.start_link
-    data = %{file_name: "foo.bin", path: "over/there", chunk_count: 3, chunks: %{ 1 => "bin1", 2 => "bin2"}}
+    data = %{file_name: "foo.bin", path: "buffer/test", chunk_count: 3, chunks: %{ 1 => "bin1", 2 => "bin2"}}
     {_, meta} = Map.pop(data, :chunks)
     {:ok, %{buffer: buffer, data: data, meta: meta}}
   end
@@ -34,11 +34,10 @@ defmodule FileDump.Test.Buffer do
     assert_receive({:EXIT, _pid, :timeout})
   end
 
-  def mock_file_write("./over/there/foo.bin", "bin1bin2bin3"), do: :ok
+  def mock_file_write("./store/buffer/test/foo.bin", "bin1bin2bin3"), do: :ok
 
   test "write file when all data has arrived", %{buffer: buffer, data: data, meta: meta} do
     with_mock File, [:passthrough], [write!: &mock_file_write/2] do
-      Application.put_env(:file_dump, :base_path, "./")
       Process.flag(:trap_exit, true)
       FileDump.Buffer.add_chunk(buffer, 0, :erlang.term_to_binary(meta))
       FileDump.Buffer.add_chunk(buffer, 1, data.chunks[1])
