@@ -37,7 +37,8 @@ defmodule FileDump.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:mock, "~> 0.1.1"}
+      {:mock, "~> 0.1.1"},
+      # {:fprofx,               [git: "git:fprofx",                       branch: "master"                ]},
     ]
   end
 end

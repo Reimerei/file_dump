@@ -3,3 +3,7 @@
 erl_crash.dump
 *.ez
 /store
+/tags
+*.trace
+*.cgrind
+mix.lock
