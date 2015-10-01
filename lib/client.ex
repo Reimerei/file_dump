@@ -2,12 +2,12 @@ defmodule FileDump.Client do
   require Logger
   use GenServer
 
-  def start_link(local_port \\ nil,opts \\ []) do
-    GenServer.start_link(__MODULE__, local_port, opts)
+  def start_link(local_port \\ nil, opts \\ []) do
+    GenServer.start_link(__MODULE__, local_port, [{:name, __MODULE__} | opts])
   end
 
-  def send_file(server, path, file_name, content) do
-    GenServer.cast(server, {:send_file, content, file_name, path})
+  def send_file(path, file_name, content) do
+    GenServer.cast(__MODULE__, {:send_file, content, file_name, path})
   end
 
   ##############################################################################
