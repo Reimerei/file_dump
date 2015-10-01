@@ -14,6 +14,8 @@ defmodule FileDump.Client do
   ## GenServer callbacks
   ##############################################################################
 
+  @max_queue 10
+
   def init(nil) do
     init(Application.get_env(:file_dump, :port))
   end
@@ -23,10 +25,11 @@ defmodule FileDump.Client do
     remote_port = Application.get_env(:file_dump, :port)
     remote_host = Application.get_env(:file_dump, :remote_host)
     {:ok, socket} = :gen_udp.open(local_port, [:binary])
-    {:ok, %{socket: socket, port: remote_port, remote_host: remote_host}}
+    delay = round(1000 / Application.get_env(:file_dump, :send_rate))
+    {:ok, %{socket: socket, port: remote_port, remote_host: remote_host, delay: delay}}
   end
 
-  def handle_cast({:send_file, content, file_name, path}, state = %{socket: socket, port: port, remote_host: remote_host}) do
+  def handle_cast({:send_file, content, file_name, path}, state = %{socket: socket, port: port, remote_host: remote_host, delay: delay}) do
     id = :crypto.rand_bytes(4)
     chunks = chunk_file(content)
 
@@ -39,6 +42,16 @@ defmodule FileDump.Client do
     |> Enum.with_index()
     |> Enum.map(fn({chunk, i}) -> make_packet(id, i + 1, chunk) end )
     |> Enum.each(fn(packet) -> :gen_udp.send(socket, remote_host, port, packet) end)
+
+    # delay to limit rate of files send
+    :timer.sleep(delay)
+
+    # check if we need to delete messages
+    case Process.info(self, :message_queue_len) do
+      {:message_queue_len, len} when len > @max_queue ->
+        :ok = discard_messages(len - @max_queue)
+      _ -> :noop
+    end
 
     {:noreply, state}
   end
@@ -66,6 +79,16 @@ defmodule FileDump.Client do
 
   def make_packet(id, seq, bin) when is_binary(bin) do
     << id :: binary-size(4), seq :: size(32), bin :: binary >>
+  end
+
+  def discard_messages(0) do
+    :ok
+  end
+
+  def discard_messages(count) do
+    receive do
+      _ -> discard_messages(count - 1)
+    end
   end
 
 end
