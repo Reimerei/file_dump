@@ -39,6 +39,7 @@ defmodule FileDump.Mixfile do
   defp deps do
     [
       {:mock, "~> 0.1.1"},
+      {:exrm, "~> 0.19.6"},
       # {:fprofx,               [git: "git:fprofx",                       branch: "master"                ]},
     ]
   end
