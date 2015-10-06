@@ -14,7 +14,7 @@ defmodule FileDump.Client do
   ## GenServer callbacks
   ##############################################################################
 
-  @max_queue 10
+  @max_queue 50
 
   def init(nil) do
     init(Application.get_env(:file_dump, :port))
