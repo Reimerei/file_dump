@@ -1,7 +1,7 @@
 defmodule FileDump.Buffer do
   use GenServer
 
-  @timeout 500
+  @timeout 2000
 
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, opts)
