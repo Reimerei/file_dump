@@ -30,7 +30,7 @@ defmodule FileDump.Test.Buffer do
   test "timeout when a packet does not arrive", %{buffer: buffer, data: data} do
     Process.flag(:trap_exit, true)
     FileDump.Buffer.add_chunk(buffer, 1, data.chunks[1])
-    :timer.sleep(550)
+    :timer.sleep(1050)
     assert_receive({:EXIT, _pid, :timeout})
   end
 

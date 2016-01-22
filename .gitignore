@@ -8,3 +8,5 @@ erl_crash.dump
 *.cgrind
 mix.lock
 /rel
+/.tags
+/.tags_sorted_by_file
