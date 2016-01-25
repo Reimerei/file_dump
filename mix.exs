@@ -12,7 +12,7 @@ defmodule FileDump.Mixfile do
 
   def application do
     [
-      applications: [:logger],
+      applications: [:logger, :syslog, :logfilter],
       env: [
         # server settings
         port: 7331,
@@ -21,7 +21,6 @@ defmodule FileDump.Mixfile do
         remote_host: 'localhost',
         send_rate: 100 # max files per second
       ],
-      included_applications: [:syslog, :logfilter],
       mod: {FileDump, []},
     ]
   end
