@@ -14,8 +14,8 @@ defmodule FileDump.Mixfile do
     [
       applications: [:logger],
       env: [
-        port: 7331,
         # server settings
+        port: 7331,
         base_path: "./store",
         #client settings
         remote_host: 'localhost',
@@ -27,6 +27,8 @@ defmodule FileDump.Mixfile do
 
   defp deps do
     [
+      {:logfilter, github: "reimerei/logfilter", branch: "master"},
+
       {:mock, "~> 0.1.1"},
       {:exrm, "~> 0.19.9"},
     ]

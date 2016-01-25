@@ -1,5 +1,6 @@
 defmodule FileDump.Buffer do
   use GenServer
+  require Log
 
   @timeout 1000
 
@@ -53,6 +54,7 @@ defmodule FileDump.Buffer do
       File.mkdir_p!(dir)
     end
     file_path = Path.join(dir, file_name)
+    Log.debug("Writing File: #{file_path}")
     File.write!(file_path, content)
     {:stop, :normal, state}
   end

@@ -6,7 +6,7 @@ defmodule FileDump.Test.Client do
   setup do
     file1 = File.read!("test/files/file1")
     file2 = File.read!("test/files/file2")
-    FileDump.Client.start_link(:random.uniform(60000) + 1024)
+    FileDump.Client.start_link()
     {:ok, %{file1: file1, file2: file2}}
   end
 

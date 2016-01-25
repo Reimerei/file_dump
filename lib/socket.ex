@@ -1,6 +1,6 @@
 defmodule FileDump.Socket do
   use GenServer
-  require Logger
+  require Log
 
   def start_link(port \\ nil, opts \\ []) do
     GenServer.start_link(__MODULE__, port, opts)
@@ -16,7 +16,7 @@ defmodule FileDump.Socket do
 
   def init(port) do
     Process.flag(:trap_exit, true)
-    Logger.info("Listening on port #{port}")
+    Log.info("Listening on port #{port}")
     {:ok, socket} = :gen_udp.open(port, [:binary])
     {:ok, %{buffers: %{}, socket: socket}}
   end
@@ -39,7 +39,7 @@ defmodule FileDump.Socket do
   end
 
   def handle_info(msg, state) do
-    Logger.error("Unhandled message: #{inspect msg}")
+    Log.error("Unhandled message: #{inspect msg}")
     {:noreply, state}
   end
 end
