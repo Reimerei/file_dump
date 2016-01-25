@@ -27,7 +27,8 @@ defmodule FileDump.Mixfile do
 
   defp deps do
     [
-      {:logfilter, github: "reimerei/logfilter", branch: "master"},
+      {:logfilter, github: "reimerei/logfilter",  branch: "master"},
+      {:syslog,    github: "reimerei/syslog",     branch: "master"},
 
       {:mock, "~> 0.1.1"},
       {:exrm, "~> 0.19.9"},
