@@ -21,7 +21,7 @@ defmodule FileDump.Mixfile do
         remote_host: 'localhost',
         send_rate: 100 # max files per second
       ],
-      included_applications: [:syslog],
+      included_applications: [:syslog, :logfilter],
       mod: {FileDump, []},
     ]
   end
