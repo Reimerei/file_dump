@@ -21,6 +21,11 @@ defmodule FileDump.Socket do
     {:ok, %{buffers: %{}, socket: socket}}
   end
 
+  def handle_info({:udp, _, remote_host, remote_port, "ping"}, state = %{socket: socket}) do
+    :gen_udp.send(socket, remote_host, remote_port, "pong")
+    {:noreply, state}
+  end
+
   def handle_info({:udp, _, _, _, << id :: size(32), seq :: size(32), data :: binary >>}, state = %{buffers: buffers}) do
     case Map.get(buffers, id) do
       nil ->

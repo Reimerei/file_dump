@@ -10,6 +10,10 @@ defmodule FileDump.Client do
     GenServer.cast(__MODULE__, {:send_file, content, file_name, path})
   end
 
+  def ping() do
+    GenServer.call(__MODULE__, :ping)
+  end
+
   ##############################################################################
   ## GenServer callbacks
   ##############################################################################
@@ -53,6 +57,13 @@ defmodule FileDump.Client do
     {:noreply, state}
   end
 
+  def handle_call(:ping, _, state = %{socket: socket, remote_port: remote_port, remote_host: remote_host}) do
+    :gen_udp.send(socket, remote_host, remote_port, "ping")        
+    receive do
+      {:udp, _, _, _, "pong"} -> {:reply, :ok, state}
+      other -> {:reply, {:error, {:unexpected, other}}, state}
+    end    
+  end
 
   def chunk_file(<< chunk :: binary-size(1024), rest :: binary >>) do
      [chunk | chunk_file(rest)]
