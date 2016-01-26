@@ -39,8 +39,8 @@ defmodule FileDump.Client do
     # send chunks
     chunks
     |> Enum.with_index()
-    |> Enum.map(fn({chunk, i}) -> {make_packet(id, i + 1, chunk), {id, i}} end )
-    |> Enum.each(fn({packet, id}) -> IO.inspect(id);:gen_udp.send(socket, remote_host, remote_port, packet) end)
+    |> Enum.map(fn({chunk, i}) -> make_packet(id, i + 1, chunk) end )
+    |> Enum.each(fn(packet) -> :gen_udp.send(socket, remote_host, remote_port, packet) end)
 
     # delay to limit rate of files send
     # :timer.sleep(delay)
