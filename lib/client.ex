@@ -43,7 +43,7 @@ defmodule FileDump.Client do
     |> Enum.each(fn(packet) -> :gen_udp.send(socket, remote_host, remote_port, packet) end)
 
     # delay to limit rate of files send
-    # :timer.sleep(delay)
+    :timer.sleep(delay)
 
     # check if we need to delete messages
     # case Process.info(self, :message_queue_len) do
