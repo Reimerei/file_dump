@@ -18,8 +18,6 @@ defmodule FileDump.Client do
   ## GenServer callbacks
   ##############################################################################
 
-  @max_queue 100
-
   def init(:ok) do
     :random.seed(:os.timestamp())
     remote_port = Application.get_env(:file_dump, :port)
@@ -41,18 +39,19 @@ defmodule FileDump.Client do
     # send chunks
     chunks
     |> Enum.with_index()
-    |> Enum.map(fn({chunk, i}) -> make_packet(id, i + 1, chunk) end )
-    |> Enum.each(fn(packet) -> :gen_udp.send(socket, remote_host, remote_port, packet) end)
+    |> Enum.map(fn({chunk, i}) -> {make_packet(id, i + 1, chunk), {id, i}} end )
+    |> Enum.each(fn({packet, id}) -> IO.inspect(id);:gen_udp.send(socket, remote_host, remote_port, packet) end)
 
     # delay to limit rate of files send
-    :timer.sleep(delay)
+    # :timer.sleep(delay)
 
     # check if we need to delete messages
-    case Process.info(self, :message_queue_len) do
-      {:message_queue_len, len} when len > @max_queue ->
-        :ok = discard_messages(len - @max_queue)
-      _ -> :noop
-    end
+    # case Process.info(self, :message_queue_len) do
+    #   {:message_queue_len, len} when len > @max_queue ->
+    #     Log.warn("FileDump: Discarding messages #{len} > #{@max_queue}")
+    #     :ok = discard_messages(len - @max_queue)
+    #   _ -> :noop
+    # end
 
     {:noreply, state}
   end

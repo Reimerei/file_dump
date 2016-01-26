@@ -63,7 +63,8 @@ defmodule FileDump.Buffer do
     {:reply, state, state, @timeout}
   end
 
-  def handle_info(:timeout, state) do
+  def handle_info(:timeout, state = %{file_name: file_name, path: path, chunks: chunks, chunk_count: chunk_count}) do
+    Log.error("Timeout receiving file #{Path.join(path, file_name)}. Received chunks: #{map_size(chunks)}, expected: #{chunk_count} ")
     {:stop, :timeout, state}
   end
 

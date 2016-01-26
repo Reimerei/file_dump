@@ -26,7 +26,7 @@ defmodule FileDump.Socket do
     {:noreply, state}
   end
 
-  def handle_info({:udp, _, _, _, << id :: size(32), seq :: size(32), data :: binary >>}, state = %{buffers: buffers}) do
+  def handle_info({:udp, _, _, _, << id :: integer-size(32), seq :: integer-size(32), data :: binary >>}, state = %{buffers: buffers}) do
     case Map.get(buffers, id) do
       nil ->
         {:ok, pid} = FileDump.Buffer.start_link()
